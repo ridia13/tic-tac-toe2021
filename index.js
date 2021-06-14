@@ -5,56 +5,83 @@ let turn = "⭕";
 const gameBoard = [];
 
 const $table = document.querySelector("table");
-let winner;
-const gameResult = (trId, tdId) => {
-  // 승부가 났는가
-  if (gameBoard[trId][0] === turn &&
-    gameBoard[trId][1] === turn &&
-    gameBoard[trId][2] === turn) {
-    winner = turn;
-  } else if (
-    gameBoard[0][tdId] === turn &&
-    gameBoard[1][tdId] === turn &&
-    gameBoard[2][tdId] === turn) {
-    winner = turn;
-  } else if (
-    gameBoard[0][0] === turn &&
-    gameBoard[1][1] === turn &&
-    gameBoard[2][2] === turn) {
-    winner = turn;
-  } else if (
-    gameBoard[0][2] === turn &&
-    gameBoard[1][1] === turn &&
-    gameBoard[2][0] === turn) {
-    winner = turn;
-  }
-  
-  gameBoard.forEach((secondArr,i,arr) => {
-    secondArr.forEach((v,i,arr) => {//every,some으로 바꿔서 draw값 구하기
-      const type = typeof v; 
-      console.log(type === 'string');
-      
+const $p = document.querySelector(".js-result");
+
+const gameResult = (target) => {//승부가 났나?
+  let rowIndex;
+  let cellIndex;
+  let hasWinner = false;
+  gameBoard.forEach((row, ri) => { //target의 index구하기
+    row.forEach((cell, ci) => {
+      if (target === cell) {
+        rowIndex = ri;
+        cellIndex = ci;
+      }
     })
-  });
-  
+  })
+  console.log(`${rowIndex}, ${cellIndex}`);
+  // 3칸이 다 채워졌나
+
+  if ( //가로
+    gameBoard[rowIndex][0].textContent === turn &&
+    gameBoard[rowIndex][1].textContent === turn &&
+    gameBoard[rowIndex][2].textContent === turn
+  ) {
+    hasWinner = true;
+  }
+  if ( //세로
+    gameBoard[0][cellIndex].textContent === turn &&
+    gameBoard[1][cellIndex].textContent === turn &&
+    gameBoard[2][cellIndex].textContent === turn
+  ) {
+    hasWinner = true;
+  }
+  if ( //대각선
+    gameBoard[0][0].textContent === turn &&
+    gameBoard[1][1].textContent === turn &&
+    gameBoard[2][2].textContent === turn
+  ) {
+    hasWinner = true;
+  }
+  if ( //대각선2
+    gameBoard[0][2].textContent === turn &&
+    gameBoard[1][1].textContent === turn &&
+    gameBoard[2][0].textContent === turn
+  ) {
+    hasWinner = true;
+  }
+  return hasWinner;
 }
 
-const clickBoard = (td) => (event) => {
-  const $tr = td.parentElement;
-  const trId = $tr.id; //===1차원 index
-  let tdId; //===2차원 index
+const haveBlank = () => {//빈칸 여부 draw
+  let draw = true;
+
+  gameBoard.forEach((row) => {
+    row.forEach((cell) => {
+      if (!cell.textContent) {
+        draw = false;
+      }
+    })
+  })
+  return draw;
+}
+
+const clickBoard = (event) => {
   const target = event.target;
-
-  for (let i = 0; i < 3; i++) { //2차원 index, tdId값
-    if ($tr.childNodes[i] === target) {
-      tdId = i;
-    }
-  }
-
   if (target.textContent) return; //칸에 글자가 있나?
   target.textContent = turn; //현재 turn값 칸에 입력
-  gameBoard[trId][tdId] = turn;
-  gameResult(trId, tdId); //승부가 났는가?
+
+  //승부가 났는가?
+  if (gameResult(target)) {
+    $p.textContent = `${turn} Win!!`;
+    $table.removeEventListener('click',clickBoard);
+    return;
+  } 
+  
+  if(haveBlank()){
+    $p.textContent = `Draw`;
+    return;
+  }
   turn = turn === "⭕" ? "❌" : "⭕"; //turn값 변경
 }
 
@@ -69,7 +96,6 @@ const createGameBoard = () => { //3x3 배열, 보드 그리기
       const $td = document.createElement("td");
       row.push($td);
       $tr.append($td);
-      $td.addEventListener('click', clickBoard($td));
     }
     gameBoard.push(row);
   }
@@ -77,5 +103,6 @@ const createGameBoard = () => { //3x3 배열, 보드 그리기
 
 function init() {
   createGameBoard();
+  $table.addEventListener('click', clickBoard);
 }
 init();
