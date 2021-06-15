@@ -7,7 +7,7 @@ const gameBoard = [];
 const $table = document.querySelector("table");
 const $p = document.querySelector(".js-result");
 
-const gameResult = (target) => {//승부가 났나?
+const gameResult = (target) => { //승부가 났나?
   let rowIndex = target.parentNode.rowIndex;
   let cellIndex = target.cellIndex;
   let hasWinner = false;
@@ -43,7 +43,7 @@ const gameResult = (target) => {//승부가 났나?
   return hasWinner;
 }
 
-const haveBlank = () => {//빈칸 여부 draw
+const haveBlank = () => { //빈칸 여부 draw
   const boardArr = gameBoard.flat();
   const draw = boardArr.every((cell) => cell.textContent);
   return draw;
@@ -56,15 +56,24 @@ const clickBoard = (event) => {
 
   //승부가 났는가?
   if (gameResult(target)) {
-    $p.textContent = `${turn} Win!!`;
-    $table.removeEventListener('click',clickBoard);
-    return;
-  } 
-  if(haveBlank()){
-    $p.textContent = `Draw`;
+    $p.textContent = turn === "⭕" ? `Win!!` : "LOSE";
+    // $p.textContent = `${turn} Win!!`;
+    $table.removeEventListener('click', clickBoard);
     return;
   }
-  turn = turn === "⭕" ? "❌" : "⭕"; //turn값 변경
+  if (haveBlank()) {
+    $p.textContent = `Draw`;
+  } else {
+    const boardArr = gameBoard.flat();
+    const randomArr = boardArr.filter((cell) => !cell.textContent);
+    const randomNum = Math.floor(Math.random() * randomArr.length); //0~lenght
+    console.log(randomNum);
+    setTimeout(() => {
+      randomArr[randomNum].textContent = "❌";
+    }, 100);
+  }
+  // turn = turn === "⭕" ? "❌" : "⭕"; //turn값 변경
+  //X 승리 버그
 }
 
 const createGameBoard = () => { //3x3 배열, 보드 그리기
