@@ -8,20 +8,10 @@ const $table = document.querySelector("table");
 const $p = document.querySelector(".js-result");
 
 const gameResult = (target) => {//승부가 났나?
-  let rowIndex;
-  let cellIndex;
+  let rowIndex = target.parentNode.rowIndex;
+  let cellIndex = target.cellIndex;
   let hasWinner = false;
-  gameBoard.forEach((row, ri) => { //target의 index구하기
-    row.forEach((cell, ci) => {
-      if (target === cell) {
-        rowIndex = ri;
-        cellIndex = ci;
-      }
-    })
-  })
-  console.log(`${rowIndex}, ${cellIndex}`);
   // 3칸이 다 채워졌나
-
   if ( //가로
     gameBoard[rowIndex][0].textContent === turn &&
     gameBoard[rowIndex][1].textContent === turn &&
