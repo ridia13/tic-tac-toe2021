@@ -44,15 +44,8 @@ const gameResult = (target) => {//승부가 났나?
 }
 
 const haveBlank = () => {//빈칸 여부 draw
-  let draw = true;
-
-  gameBoard.forEach((row) => {
-    row.forEach((cell) => {
-      if (!cell.textContent) {
-        draw = false;
-      }
-    })
-  })
+  const boardArr = gameBoard.flat();
+  const draw = boardArr.every((cell) => cell.textContent);
   return draw;
 }
 
@@ -67,7 +60,6 @@ const clickBoard = (event) => {
     $table.removeEventListener('click',clickBoard);
     return;
   } 
-  
   if(haveBlank()){
     $p.textContent = `Draw`;
     return;
