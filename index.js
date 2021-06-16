@@ -1,11 +1,10 @@
 "use strict";
 
 let turn = "⭕";
-
 const gameBoard = [];
-
 const $table = document.querySelector("table");
 const $p = document.querySelector(".js-result");
+let clickable = true;
 
 const winnerComesOut = (target) => { //승부가 났나?
   let rowIndex = target.parentNode.rowIndex;
@@ -63,8 +62,8 @@ const gameResult = (target) => {
   }
   turn = turn === "⭕" ? "❌" : "⭕"; //turn 넘기기
 }
+
 const computerTurn = () => {
-  if (turn === "⭕") return;
   const boardArr = gameBoard.flat();
   const blankArr = boardArr.filter((cell) => !cell.textContent);
   const randomNum = Math.floor(Math.random() * blankArr.length); //0~lenght
@@ -73,18 +72,20 @@ const computerTurn = () => {
     randomCell = blankArr[randomNum];
     randomCell.textContent = turn;
     gameResult(randomCell);
-  }, 300);
+    clickable = true;
+  }, 1000);
 }
 
 const clickBoard = (event) => {
-  if (turn === "❌") return;
-
+  if (!clickable) return;
   const target = event.target;
   if (target.textContent) return; //칸에 글자가 있나?
   target.textContent = turn; //현재 turn값 칸에 입력
-
   gameResult(target); //승부가 났는가?
-  computerTurn();
+  if (turn === "❌") {//computer turn
+    clickable = false;
+    computerTurn();
+  }
 }
 
 const createGameBoard = () => { //3x3 배열, 보드 그리기
@@ -105,6 +106,8 @@ const createGameBoard = () => { //3x3 배열, 보드 그리기
 
 function init() {
   createGameBoard();
-  $table.addEventListener('click', clickBoard);
+  if (clickable) {
+    $table.addEventListener('click', clickBoard);
+  }
 }
 init();
