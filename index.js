@@ -7,7 +7,7 @@ const gameBoard = [];
 const $table = document.querySelector("table");
 const $p = document.querySelector(".js-result");
 
-const gameResult = (target) => { //승부가 났나?
+const winnerComesOut = (target) => { //승부가 났나?
   let rowIndex = target.parentNode.rowIndex;
   let cellIndex = target.cellIndex;
   let hasWinner = false;
@@ -41,25 +41,28 @@ const gameResult = (target) => { //승부가 났나?
     hasWinner = true;
   }
 
-  if (hasWinner) {//승자있나
-    $p.textContent = turn === "⭕" ? `Win!!` : "LOSE";
-    $table.removeEventListener('click', clickBoard);
-  } else {
-    haveBlank(); //무승부인가
-  }
+  return hasWinner;
 }
 
 const haveBlank = () => { //빈칸 여부 draw
   const boardArr = gameBoard.flat();
   const draw = boardArr.every((cell) => cell.textContent);
 
-  if (draw) {
-    $p.textContent = `Draw`;
-  } else {
-    turn = turn === "⭕" ? "❌" : "⭕"; //turn 넘기기
-  }
+  return draw;
 }
 
+const gameResult = (target) => {
+  if (winnerComesOut(target)) { //승자있나
+    $p.textContent = turn === "⭕" ? `Win!!` : "LOSE";
+    $table.removeEventListener('click', clickBoard);
+    return;
+  }
+  if (haveBlank()) { //무승부인가
+    $p.textContent = `Draw`;
+    return;
+  }
+  turn = turn === "⭕" ? "❌" : "⭕"; //turn 넘기기
+}
 const computerTurn = () => {
   if (turn === "⭕") return;
   const boardArr = gameBoard.flat();
