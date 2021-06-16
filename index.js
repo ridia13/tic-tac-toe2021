@@ -40,40 +40,48 @@ const gameResult = (target) => { //승부가 났나?
   ) {
     hasWinner = true;
   }
-  return hasWinner;
+
+  if (hasWinner) {//승자있나
+    $p.textContent = turn === "⭕" ? `Win!!` : "LOSE";
+    $table.removeEventListener('click', clickBoard);
+  } else {
+    haveBlank(); //무승부인가
+  }
 }
 
 const haveBlank = () => { //빈칸 여부 draw
   const boardArr = gameBoard.flat();
   const draw = boardArr.every((cell) => cell.textContent);
-  return draw;
+
+  if (draw) {
+    $p.textContent = `Draw`;
+  } else {
+    turn = turn === "⭕" ? "❌" : "⭕"; //turn 넘기기
+  }
+}
+
+const computerTurn = () => {
+  if (turn === "⭕") return;
+  const boardArr = gameBoard.flat();
+  const blankArr = boardArr.filter((cell) => !cell.textContent);
+  const randomNum = Math.floor(Math.random() * blankArr.length); //0~lenght
+  let randomCell;
+  setTimeout(() => {
+    randomCell = blankArr[randomNum];
+    randomCell.textContent = turn;
+    gameResult(randomCell);
+  }, 300);
 }
 
 const clickBoard = (event) => {
+  if (turn === "❌") return;
+
   const target = event.target;
   if (target.textContent) return; //칸에 글자가 있나?
   target.textContent = turn; //현재 turn값 칸에 입력
 
-  //승부가 났는가?
-  if (gameResult(target)) {
-    $p.textContent = turn === "⭕" ? `Win!!` : "LOSE";
-    // $p.textContent = `${turn} Win!!`;
-    $table.removeEventListener('click', clickBoard);
-    return;
-  }
-  if (haveBlank()) {
-    $p.textContent = `Draw`;
-  } else {
-    const boardArr = gameBoard.flat();
-    const randomArr = boardArr.filter((cell) => !cell.textContent);
-    const randomNum = Math.floor(Math.random() * randomArr.length); //0~lenght
-    console.log(randomNum);
-    setTimeout(() => {
-      randomArr[randomNum].textContent = "❌";
-    }, 100);
-  }
-  // turn = turn === "⭕" ? "❌" : "⭕"; //turn값 변경
-  //X 승리 버그
+  gameResult(target); //승부가 났는가?
+  computerTurn();
 }
 
 const createGameBoard = () => { //3x3 배열, 보드 그리기
